@@ -1,0 +1,51 @@
+// android/app/build.gradle  — add the `buildTypes` and `splits` blocks shown
+// below.  Do NOT replace your whole file — just merge these sections in.
+
+// ── PASTE THIS into your existing android { ... } block ──────────────────────
+
+android {
+    // ... your existing config ...
+
+    buildTypes {
+        debug {
+            // Skip shrinking/obfuscation entirely in debug — saves ~30-60s
+            minifyEnabled false
+            shrinkResources false
+            // Faster manifest merging
+            manifestPlaceholders = [:]
+        }
+        release {
+            // keep your existing release config
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+        }
+    }
+
+    // ── ABI split for debug ───────────────────────────────────────────────────
+    // During development, only build for the ABI of YOUR device.
+    // This cuts native library compile + link time roughly in half.
+    //
+    // arm64-v8a  → most modern Android phones (Galaxy S21 FE = arm64-v8a ✓)
+    // armeabi-v7a → older 32-bit devices
+    // x86_64     → emulators
+    //
+    splits {
+        abi {
+            enable true
+            reset()
+            // ▼ Change to match YOUR device's ABI ▼
+            include "arm64-v8a"
+            universalApk false
+        }
+    }
+
+    // Disable unused build features to cut config time
+    buildFeatures {
+        buildConfig false
+        aidl false
+        renderScript false
+        resValues false
+        shaders false
+    }
+}
